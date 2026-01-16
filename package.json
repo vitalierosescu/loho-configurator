@@ -1,0 +1,25 @@
+{
+  "name": "loho-configurator",
+  "version": "1.0.0",
+  "description": "LOHO Bath Configurator - A customizable product configurator",
+  "main": "dist/configurator.min.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "dev": "npx live-server --port=3000"
+  },
+  "license": "MIT"
+}
+```
+
+---
+
+**`.gitignore`**
+```
+node_modules/
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+.env
+.env.local

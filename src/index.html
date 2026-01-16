@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LOHO Bath Configurator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="src/styles.css">
+  <style>* { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Inter', sans-serif; }</style>
+</head>
+<body>
+
+  <div class="loho-configurator" data-loho-configurator>
+    <div class="configurator-wrapper">
+
+      <div class="configurator-left">
+        <div class="loho-logo">
+          <div class="loho-logo__text">LOHO</div>
+          <div class="loho-logo__sub">Bath Configurator</div>
+        </div>
+
+        <div class="progress-bar"><div class="progress-fill" data-progress></div></div>
+
+        <!-- STEP 1: MODEL -->
+        <div class="step" data-step="1">
+          <h2 class="step-title">Choose your model</h2>
+          <p class="step-subtitle">Pick the size that fits your space and comfort.</p>
+          <a class="step-link">Show details about models</a>
+          <div class="options-list">
+            <label class="option-card selected" data-option="model" data-value="linea">
+              <input type="radio" name="model" value="linea" checked hidden>
+              <span class="option-label">Linea</span>
+            </label>
+          </div>
+          <p class="step-note">Note: Due to the production process every piece is unique in size and form.</p>
+        </div>
+
+        <!-- STEP 2: SIZE -->
+        <div class="step" data-step="2" style="display: none;">
+          <h2 class="step-title">Choose your size</h2>
+          <p class="step-subtitle">Pick the size that fits your space and comfort.</p>
+          <div class="options-list">
+            <label class="option-card" data-option="size" data-value="small"><input type="radio" name="size" value="small" hidden><span class="option-label">Small</span><span class="option-meta">170×85×60</span></label>
+            <label class="option-card" data-option="size" data-value="medium"><input type="radio" name="size" value="medium" hidden><span class="option-label">Medium</span><span class="option-meta">180×90×65</span></label>
+            <label class="option-card" data-option="size" data-value="large"><input type="radio" name="size" value="large" hidden><span class="option-label">Large</span><span class="option-badge">Most common</span><span class="option-meta">190×95×65</span></label>
+            <label class="option-card" data-option="size" data-value="large-high"><input type="radio" name="size" value="large-high" hidden><span class="option-label">Large High</span><span class="option-meta">190×95×72</span></label>
+            <label class="option-card" data-option="size" data-value="extra-large"><input type="radio" name="size" value="extra-large" hidden><span class="option-label">Extra Large</span><span class="option-meta">200×100×70</span></label>
+            <label class="option-card" data-option="size" data-value="extra-large-high"><input type="radio" name="size" value="extra-large-high" hidden><span class="option-label">Extra Large High</span><span class="option-meta">200×100×78</span></label>
+          </div>
+        </div>
+
+        <!-- STEP 3: RIM -->
+        <div class="step" data-step="3" style="display: none;">
+          <h2 class="step-title">Choose your rim</h2>
+          <p class="step-subtitle">Select a rimless look or a subtle raised edge.</p>
+          <div class="options-grid">
+            <label class="option-card option-card--image" data-option="rim" data-value="with-rim"><input type="radio" name="rim" value="with-rim" hidden><img src="https://placehold.co/300x200/b8c4c8/333?text=With+Rim" alt="With rim" class="option-image"><span class="option-label">With rim</span></label>
+            <label class="option-card option-card--image" data-option="rim" data-value="without-rim"><input type="radio" name="rim" value="without-rim" hidden><img src="https://placehold.co/300x200/4a4a4a/fff?text=Without+Rim" alt="Without rim" class="option-image"><span class="option-label">Without rim</span></label>
+          </div>
+        </div>
+
+        <!-- STEP 4: FINISH -->
+        <div class="step" data-step="4" style="display: none;">
+          <h2 class="step-title">Choose your finish</h2>
+          <p class="step-subtitle">Select the texture and feel that match your interior.</p>
+          <div class="finish-section">
+            <h4 class="finish-label">Interior finish</h4>
+            <div class="options-list" style="margin-top: 12px;">
+              <label class="option-card" data-option="interior-finish" data-value="pure-clay"><input type="radio" name="interior-finish" value="pure-clay" hidden><span class="option-label">Pure Clay</span></label>
+              <label class="option-card" data-option="interior-finish" data-value="glaze"><input type="radio" name="interior-finish" value="glaze" hidden><span class="option-label">Glaze</span></label>
+              <label class="option-card" data-option="interior-finish" data-value="glossy-glaze"><input type="radio" name="interior-finish" value="glossy-glaze" hidden><span class="option-label">Glossy Glaze</span></label>
+              <label class="option-card" data-option="interior-finish" data-value="matte-glaze"><input type="radio" name="interior-finish" value="matte-glaze" hidden><span class="option-label">Matte Glaze</span></label>
+            </div>
+          </div>
+          <div class="finish-section">
+            <h4 class="finish-label">Exterior finish</h4>
+            <div class="options-list" style="margin-top: 12px;">
+              <label class="option-card" data-option="exterior-finish" data-value="smooth"><input type="radio" name="exterior-finish" value="smooth" hidden><span class="option-label">Smooth</span></label>
+              <label class="option-card" data-option="exterior-finish" data-value="raw"><input type="radio" name="exterior-finish" value="raw" hidden><span class="option-label">Raw</span></label>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 5: COLOR -->
+        <div class="step" data-step="5" style="display: none;">
+          <h2 class="step-title">Choose your color</h2>
+          <p class="step-subtitle">Explore a curated palette of natural tones.</p>
+          <div class="color-grid">
+            <label class="color-swatch" data-option="color" data-value="pure-clay" data-image="https://placehold.co/800x600/b8c4c8/333?text=Pure+Clay"><input type="radio" name="color" value="pure-clay" hidden><img src="https://placehold.co/100x100/b8c4c8/333" alt="Pure Clay"><span class="color-name">Pure Clay</span></label>
+            <label class="color-swatch" data-option="color" data-value="glaze" data-image="https://placehold.co/800x600/8b5a2b/fff?text=Glaze"><input type="radio" name="color" value="glaze" hidden><img src="https://placehold.co/100x100/8b5a2b/fff" alt="Glaze"><span class="color-name">Glaze</span></label>
+            <label class="color-swatch" data-option="color" data-value="blue-3" data-image="https://placehold.co/800x600/1e3a5f/fff?text=Blue"><input type="radio" name="color" value="blue-3" hidden><img src="https://placehold.co/100x100/1e3a5f/fff" alt="Blue 3"><span class="color-name">Blue 3</span></label>
+            <label class="color-swatch" data-option="color" data-value="ochre-4" data-image="https://placehold.co/800x600/c4a35a/333?text=Ochre"><input type="radio" name="color" value="ochre-4" hidden><img src="https://placehold.co/100x100/c4a35a/333" alt="Ochre 4"><span class="color-name">Ochre 4</span></label>
+            <label class="color-swatch" data-option="color" data-value="ochre-6" data-image="https://placehold.co/800x600/c87533/fff?text=Ochre+6"><input type="radio" name="color" value="ochre-6" hidden><img src="https://placehold.co/100x100/c87533/fff" alt="Ochre 6"><span class="color-name">Ochre 6</span></label>
+            <label class="color-swatch" data-option="color" data-value="red-3" data-image="https://placehold.co/800x600/c45c4a/fff?text=Red"><input type="radio" name="color" value="red-3" hidden><img src="https://placehold.co/100x100/c45c4a/fff" alt="Red 3"><span class="color-name">Red 3</span></label>
+            <label class="color-swatch" data-option="color" data-value="green-4" data-image="https://placehold.co/800x600/5a7a4a/fff?text=Green"><input type="radio" name="color" value="green-4" hidden><img src="https://placehold.co/100x100/5a7a4a/fff" alt="Green 4"><span class="color-name">Green 4</span></label>
+            <label class="color-swatch" data-option="color" data-value="red-5" data-image="https://placehold.co/800x600/9a5a5a/fff?text=Red+5"><input type="radio" name="color" value="red-5" hidden><img src="https://placehold.co/100x100/9a5a5a/fff" alt="Red 5"><span class="color-name">Red 5</span></label>
+          </div>
+          <p class="step-note">*The colors may differ due to natural properties of clay. Each creation is <strong>one of a kind</strong>.</p>
+        </div>
+
+        <!-- STEP 6: SUBMIT -->
+        <div class="step" data-step="6" style="display: none;">
+          <h2 class="step-title">Submit your design</h2>
+          <p class="step-subtitle">You receive the 3D files upon submitting.</p>
+          <form id="configurator-form" class="submit-form">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input type="text" name="firstname" placeholder="Firstname" class="form-input">
+              <input type="text" name="lastname" placeholder="Lastname" class="form-input" style="margin-top: 8px;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email *</label>
+              <input type="email" name="email" required placeholder="your@email.com" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone (optional)</label>
+              <input type="tel" name="phone" placeholder="+32 487 37 36 68" class="form-input">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Installation date *</label>
+              <div class="date-options">
+                <label class="date-chip"><input type="radio" name="installation" value="within-3-months" hidden><span>within 3 months</span></label>
+                <label class="date-chip"><input type="radio" name="installation" value="3-6-months" hidden><span>3 - 6 months</span></label>
+                <label class="date-chip"><input type="radio" name="installation" value="6-months-plus" hidden><span>> 6 months</span></label>
+                <label class="date-chip"><input type="radio" name="installation" value="1-year-plus" hidden><span>> 1 year</span></label>
+                <label class="date-chip"><input type="radio" name="installation" value="unknown" hidden><span>unknown</span></label>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div class="nav-buttons">
+          <button class="btn-previous" data-nav="previous" style="display: none;">Previous</button>
+          <button class="btn-next" data-nav="next">Next</button>
+          <button class="btn-submit" data-nav="submit" style="display: none;">Request quote</button>
+        </div>
+      </div>
+
+      <div class="configurator-right">
+        <img src="https://placehold.co/800x600/b8c4c8/333?text=LOHO+Bath" alt="Bath preview" class="preview-image" data-preview>
+        <p class="color-note">*Colors may differ due to natural properties of clay.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- THANK YOU -->
+  <div class="thank-you-screen" data-thank-you style="display: none; background: linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), url('https://placehold.co/1920x1080/8a7a6a/fff') center/cover;">
+    <div class="thank-you-content">
+      <img src="https://placehold.co/200x150/8a7a6a/fff?text=Your+Bath" alt="Your bath" class="thank-you-image">
+      <h2>Thank you for your request.</h2>
+      <p>Beneath you'll find the steps on what happens next.</p>
+      <div class="next-steps">
+        <div class="step-item active"><span class="step-number">1</span><span>You'll receive a confirmation in your mailbox.</span></div>
+        <div class="step-item"><span class="step-number">2</span><span>We'll get in touch</span></div>
+        <div class="step-item"><span class="step-number">3</span><span>Technical check & quote</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="src/index.js"></script>
+</body>
+</html>

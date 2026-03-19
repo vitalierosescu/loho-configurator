@@ -431,18 +431,28 @@ function previousStep() {
 // ============================================
 // SELECTION HANDLING
 // ============================================
+
+/**
+ * Resolve the actual value for a card click.
+ * Webflow components bake the same data-value into all instances,
+ * so for colors we derive a unique slug from the color name text.
+ */
+function resolveCardValue(card) {
+  var value = card.dataset.value
+  var nameEl = card.querySelector('.color-name-text')
+  if (nameEl) {
+    var slug = nameEl.textContent.trim().toLowerCase().replace(/\s+/g, '-')
+    if (slug) value = slug
+  }
+  return value
+}
+
 function handleOptionClick(e) {
   var card = e.target.closest('[data-option]')
   if (!card) return
   var optionType = card.dataset.option
-  var value = card.dataset.value
-  var imageUrl = card.dataset.image
-
-  // For component instances: data-value and data-image live on the parent wrapper
-  if (!value && card.parentElement) {
-    value = card.parentElement.dataset.value || value
-    imageUrl = card.parentElement.dataset.image || imageUrl
-  }
+  var value = resolveCardValue(card)
+  var imageUrl = card.dataset.image || ''
 
   if (!value) return
 
@@ -452,10 +462,8 @@ function handleOptionClick(e) {
   var siblings = document.querySelectorAll('[data-option="' + optionType + '"]')
   siblings.forEach(function (sibling) {
     sibling.classList.remove('selected')
-    if (sibling.parentElement) sibling.parentElement.classList.remove('selected')
   })
   card.classList.add('selected')
-  if (card.parentElement) card.parentElement.classList.add('selected')
 
   var radio = card.querySelector('input[type="radio"]')
   if (radio) radio.checked = true
@@ -682,24 +690,31 @@ function showThankYou() {
 function restoreUIFromState() {
   Object.keys(state.selections).forEach(function (optionType) {
     var value = state.selections[optionType]
-    if (value) {
-      // Try direct match first, then check parent wrappers (component instances)
-      var card = document.querySelector(
-        '[data-option="' + optionType + '"][data-value="' + value + '"]'
-      )
-      if (!card) {
-        var wrapper = document.querySelector('[data-value="' + value + '"]')
-        if (wrapper) card = wrapper.querySelector('[data-option="' + optionType + '"]')
-      }
-      if (card) {
-        card.classList.add('selected')
-        if (card.parentElement) card.parentElement.classList.add('selected')
-        var radio = card.querySelector('input[type="radio"]')
-        if (radio) radio.checked = true
-        var imageUrl = card.dataset.image || (card.parentElement && card.parentElement.dataset.image)
-        if (optionType === 'color' && imageUrl && elements.preview) {
-          elements.preview.src = imageUrl
+    if (!value) return
+
+    // Try direct data-value match first
+    var card = document.querySelector(
+      '[data-option="' + optionType + '"][data-value="' + value + '"]'
+    )
+
+    // For color swatches: match by color name slug (component instances share data-value)
+    if (!card && optionType === 'color') {
+      var allSwatches = document.querySelectorAll('[data-option="color"]')
+      for (var i = 0; i < allSwatches.length; i++) {
+        if (resolveCardValue(allSwatches[i]) === value) {
+          card = allSwatches[i]
+          break
         }
+      }
+    }
+
+    if (card) {
+      card.classList.add('selected')
+      var radio = card.querySelector('input[type="radio"]')
+      if (radio) radio.checked = true
+      var imageUrl = card.dataset.image
+      if (optionType === 'color' && imageUrl && elements.preview) {
+        elements.preview.src = imageUrl
       }
     }
   })

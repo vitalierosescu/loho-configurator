@@ -261,7 +261,12 @@ function updateProgress() {
   if (elements.progress) {
     var percentage = (state.currentStep / state.totalSteps) * 100
     if (window.gsap) {
-      gsap.to(elements.progress, { width: percentage + '%', duration: 0.6, ease: 'power3.inOut' })
+      gsap.to(elements.progress, {
+        width: percentage + '%',
+        duration: 0.4,
+        ease: 'power2.out',
+        overwrite: true,
+      })
     } else {
       elements.progress.style.width = percentage + '%'
     }
@@ -271,33 +276,36 @@ function updateProgress() {
 // ============================================
 // GSAP ANIMATIONS
 // ============================================
-var ANIMATION_DURATION = 0.55
-var STAGGER_AMOUNT = 0.04
-var MAX_STAGGER_TOTAL = 0.35
-
-function getStaggerValue(itemCount) {
-  if (itemCount <= 1) return 0
-  var totalStaggerTime = STAGGER_AMOUNT * (itemCount - 1)
-  if (totalStaggerTime > MAX_STAGGER_TOTAL) {
-    return MAX_STAGGER_TOTAL / (itemCount - 1)
-  }
-  return STAGGER_AMOUNT
+var ANIM = {
+  outDuration: 0.25,
+  inDuration: 0.4,
+  stagger: 0.03,
+  maxStagger: 0.25,
+  yShift: 20,
 }
 
-function getAnimatableElements(stepEl) {
-  var title = stepEl.querySelector('.step-title')
-  var subtitle = stepEl.querySelector('.step-subtitle')
-  var note = stepEl.querySelector('.step-note')
-  var link = stepEl.querySelector('.step-link')
-  var options = stepEl.querySelectorAll('.option-card, .color-swatch, .date-chip')
-  var labels = stepEl.querySelectorAll('.finish-label, .form-label')
-  var inputs = stepEl.querySelectorAll('.form-input')
-  return [title, subtitle, link]
-    .concat(Array.from(labels), Array.from(options), Array.from(inputs), [note])
-    .filter(Boolean)
+// Cache animatable children per step (built once on init)
+var stepChildrenCache = {}
+
+function getStepChildren(stepEl) {
+  var stepId = stepEl.getAttribute('data-step')
+  if (stepChildrenCache[stepId]) return stepChildrenCache[stepId]
+
+  var children = stepEl.querySelectorAll(
+    '.step-title, .step-subtitle, .step-link, .modal_button, .finish-label, .form-label, .option-card, .color-swatch, .date-chip, .form-input, .step-note, .form-group'
+  )
+  var arr = Array.from(children)
+  stepChildrenCache[stepId] = arr
+  return arr
 }
 
-function animateStepOut(stepEl, direction) {
+function getStagger(count) {
+  if (count <= 1) return 0
+  var total = ANIM.stagger * (count - 1)
+  return total > ANIM.maxStagger ? ANIM.maxStagger / (count - 1) : ANIM.stagger
+}
+
+function animateStepOut(stepEl) {
   return new Promise(function (resolve) {
     if (!window.gsap || !stepEl) {
       if (stepEl) stepEl.style.display = 'none'
@@ -305,31 +313,28 @@ function animateStepOut(stepEl, direction) {
       return
     }
 
-    var yOffset = direction === 'next' ? -30 : 30
-    var toAnimate = getAnimatableElements(stepEl)
-    var stagger = getStaggerValue(toAnimate.length)
+    var children = getStepChildren(stepEl)
 
-    gsap.killTweensOf(toAnimate)
-
-    gsap.to(toAnimate, {
-      opacity: 0,
-      y: yOffset,
-      duration: ANIMATION_DURATION * 0.55,
-      stagger: {
-        each: stagger,
-        from: direction === 'next' ? 'start' : 'end',
-      },
-      ease: 'power3.in',
+    // Single timeline: fade container + slide children
+    var tl = gsap.timeline({
       onComplete: function () {
         stepEl.style.display = 'none'
-        gsap.set(toAnimate, { clearProps: 'opacity,y' })
+        // Reset with transforms only (no clearProps layout thrash)
+        gsap.set(children, { y: 0, clearProps: 'opacity' })
         resolve()
       },
+    })
+
+    tl.to(stepEl, {
+      autoAlpha: 0,
+      duration: ANIM.outDuration,
+      ease: 'power2.in',
+      force3D: true,
     })
   })
 }
 
-function animateStepIn(stepEl, direction) {
+function animateStepIn(stepEl) {
   return new Promise(function (resolve) {
     if (!stepEl) {
       resolve()
@@ -343,25 +348,23 @@ function animateStepIn(stepEl, direction) {
       return
     }
 
-    var yOffset = direction === 'next' ? 30 : -30
-    var toAnimate = getAnimatableElements(stepEl)
-    var stagger = getStaggerValue(toAnimate.length)
+    var children = getStepChildren(stepEl)
+    var stagger = getStagger(children.length)
 
-    gsap.killTweensOf(toAnimate)
-    gsap.set(toAnimate, { opacity: 0, y: yOffset })
+    // Set initial state
+    gsap.set(stepEl, { autoAlpha: 1 })
+    gsap.set(children, { opacity: 0, y: ANIM.yShift, force3D: true })
 
-    gsap.delayedCall(0.06, function () {
-      gsap.to(toAnimate, {
-        opacity: 1,
-        y: 0,
-        duration: ANIMATION_DURATION,
-        stagger: {
-          each: stagger,
-          from: direction === 'next' ? 'start' : 'end',
-        },
-        ease: 'power3.out',
-        onComplete: resolve,
-      })
+    // Stagger children in
+    gsap.to(children, {
+      opacity: 1,
+      y: 0,
+      duration: ANIM.inDuration,
+      stagger: stagger,
+      ease: 'power2.out',
+      force3D: true,
+      overwrite: 'auto',
+      onComplete: resolve,
     })
   })
 }
@@ -371,21 +374,20 @@ function animateStepIn(stepEl, direction) {
 // ============================================
 var isAnimating = false
 
-function goToStep(stepNumber, direction) {
+function goToStep(stepNumber) {
   if (isAnimating) return
   isAnimating = true
-  direction = direction || 'next'
 
   var currentStepEl = document.querySelector('[data-step="' + state.currentStep + '"]')
   var nextStepEl = document.querySelector('[data-step="' + stepNumber + '"]')
 
-  animateStepOut(currentStepEl, direction)
+  animateStepOut(currentStepEl)
     .then(function () {
       state.currentStep = stepNumber
       saveToStorage()
       updateNavButtons()
       updateProgress()
-      return animateStepIn(nextStepEl, direction)
+      return animateStepIn(nextStepEl)
     })
     .then(function () {
       isAnimating = false
@@ -397,19 +399,23 @@ function nextStep() {
   if (!validation.isValid) {
     showValidationMessage(validation.message)
     if (window.gsap && elements.btnNext) {
-      gsap
-        .timeline()
-        .to(elements.btnNext, { x: -5, duration: 0.05 })
-        .to(elements.btnNext, { x: 5, duration: 0.05 })
-        .to(elements.btnNext, { x: -5, duration: 0.05 })
-        .to(elements.btnNext, { x: 5, duration: 0.05 })
-        .to(elements.btnNext, { x: 0, duration: 0.05 })
+      gsap.to(elements.btnNext, {
+        keyframes: [
+          { x: -5, duration: 0.05 },
+          { x: 5, duration: 0.05 },
+          { x: -3, duration: 0.05 },
+          { x: 3, duration: 0.05 },
+          { x: 0, duration: 0.05 },
+        ],
+        ease: 'none',
+        overwrite: true,
+      })
     }
     return
   }
   hideValidationMessage()
   if (state.currentStep < state.totalSteps) {
-    goToStep(state.currentStep + 1, 'next')
+    goToStep(state.currentStep + 1)
   } else {
     handleSubmit()
   }
@@ -418,7 +424,7 @@ function nextStep() {
 function previousStep() {
   hideValidationMessage()
   if (state.currentStep > 1) {
-    goToStep(state.currentStep - 1, 'prev')
+    goToStep(state.currentStep - 1)
   }
 }
 
